@@ -101,11 +101,12 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    lib.addIncludePath(.{ .cwd_relative = "3rdparty/uchardet/src/" });
 
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
     // running `zig build`).
-    lib.install();
+    b.installArtifact(lib);
 
     // Creates a step for unit testing.
     const main_tests = b.addTest(.{
@@ -113,6 +114,8 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    main_tests.linkLibC();
+    main_tests.addIncludePath(.{ .cwd_relative = "3rdparty/uchardet/src/" });
 
     // This creates a build step. It will be visible in the `zig build --help` menu,
     // and can be selected like this: `zig build test`
