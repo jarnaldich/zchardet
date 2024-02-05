@@ -92,6 +92,7 @@ pub fn build(b: *std.Build) void {
         "-Wno-missing-field-initializers",
     });
     uchardet.linkLibCpp();
+    uchardet.installHeader("3rdparty/uchardet/src/uchardet.h", "uchardet.h");
     b.installArtifact(uchardet);
 
     const lib = b.addStaticLibrary(.{
