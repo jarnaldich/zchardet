@@ -110,6 +110,11 @@ pub fn build(b: *std.Build) void {
     // running `zig build`).
     b.installArtifact(lib);
 
+    // The module for package management
+    _ = b.addModule("zchardet", .{
+        .source_file = .{ .path = "src/main.zig" },
+    });
+
     // Creates a step for unit testing.
     const main_tests = b.addTest(.{
         .root_source_file = .{ .path = "src/main.zig" },
