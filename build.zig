@@ -23,6 +23,8 @@ pub fn build(b: *std.Build) void {
     });
 
     uchardet.addCSourceFiles(&.{
+        "3rdparty/uchardet/src/CharDistribution.cpp",
+        "3rdparty/uchardet/src/JpCntx.cpp",
         "3rdparty/uchardet/src/LangModels/LangArabicModel.cpp",
         "3rdparty/uchardet/src/LangModels/LangBelarusianModel.cpp",
         "3rdparty/uchardet/src/LangModels/LangBulgarianModel.cpp",
@@ -89,7 +91,6 @@ pub fn build(b: *std.Build) void {
         "-Wwrite-strings",
         "-Wno-missing-field-initializers",
     });
-
     uchardet.linkLibCpp();
     b.installArtifact(uchardet);
 
@@ -101,7 +102,8 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    lib.addIncludePath(.{ .cwd_relative = "3rdparty/uchardet/src/" });
+    //lib.addIncludePath(.{ .cwd_relative = "3rdparty/uchardet/src/" });
+    lib.addIncludePath("3rdparty/uchardet/src/");
 
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
@@ -115,11 +117,12 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     main_tests.linkLibC();
-    main_tests.addIncludePath(.{ .cwd_relative = "3rdparty/uchardet/src/" });
+    main_tests.addIncludePath("3rdparty/uchardet/src/");
+    main_tests.linkLibrary(uchardet);
 
     // This creates a build step. It will be visible in the `zig build --help` menu,
     // and can be selected like this: `zig build test`
     // This will evaluate the `test` step rather than the default, which is "install".
     const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&main_tests.step);
+    test_step.dependOn(&main_tests.run().step);
 }
