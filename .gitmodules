@@ -1,4 +1,1 @@
-[submodule "3rdparty/uchardet"]
-	path = 3rdparty/uchardet
-	url = https://gitlab.freedesktop.org/uchardet/uchardet.git
-	branch = 0.0.8
+
