@@ -1,5 +1,5 @@
 .{
     .name = "zchardet",
     .version = "0.8.0",
-    .paths = .{ "src", "build.zig" }
+    .paths = .{ "3rdparty/uchardet/src", "src", "build.zig" }
 }
