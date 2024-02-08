@@ -106,18 +106,20 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    lib.addIncludePath(.{ .cwd_relative = "3rdparty/uchardet/src/" });
-    //lib.addIncludePath("3rdparty/uchardet/src/");
+    lib.addIncludePath(.{ .path = b.pathFromRoot("3rdparty/uchardet/src/") });
+    lib.linkLibrary(uchardet);
+    b.installArtifact(lib);
 
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
     // running `zig build`).
-    b.installArtifact(lib);
 
     // The module for package management
-    _ = b.addModule("zchardet", .{
-        .root_source_file = .{ .path = "src/main.zig" },
+    const zchardet_module = b.addModule("zchardet", .{
+        .root_source_file = .{ .path = b.pathFromRoot("src/main.zig") },
     });
+    zchardet_module.addIncludePath(.{ .path = "3rdpary/uchardet/src/" });
+    zchardet_module.linkLibrary(uchardet);
 
     // Creates a step for unit testing.
     const main_tests = b.addTest(.{
@@ -126,8 +128,8 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     main_tests.linkLibC();
+
     //    main_tests.addIncludePath("3rdparty/uchardet/src/");
-    lib.addIncludePath(.{ .cwd_relative = "3rdparty/uchardet/src/" });
     main_tests.linkLibrary(uchardet);
 
     // This creates a build step. It will be visible in the `zig build --help` menu,
