@@ -16,6 +16,7 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
+    // This generates a "C" static library
     const uchardet = b.addStaticLibrary(.{
         .name = "uchardet",
         .target = target,
@@ -95,9 +96,11 @@ pub fn build(b: *std.Build) void {
         },
     });
     uchardet.linkLibCpp();
+    // The following is required
     uchardet.installHeader("3rdparty/uchardet/src/uchardet.h", "uchardet.h");
     b.installArtifact(uchardet);
 
+    // This is a wrapper Zig static library.
     const lib = b.addStaticLibrary(.{
         .name = "zchardet",
         // In this case the main source file is merely a path, however, in more
@@ -115,11 +118,13 @@ pub fn build(b: *std.Build) void {
     // running `zig build`).
 
     // The module for package management
+    // This will make it possible for Zig applications to use the library
+    // without needing to know anything from the underlying "C" library (uchardet)
     const zchardet_module = b.addModule("zchardet", .{
         .root_source_file = .{ .path = b.pathFromRoot("src/main.zig") },
     });
-    zchardet_module.addIncludePath(.{ .path = "3rdpary/uchardet/src/" });
     zchardet_module.linkLibrary(uchardet);
+    zchardet_module.linkLibrary(lib);
 
     // Creates a step for unit testing.
     const main_tests = b.addTest(.{
@@ -128,8 +133,6 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     main_tests.linkLibC();
-
-    //    main_tests.addIncludePath("3rdparty/uchardet/src/");
     main_tests.linkLibrary(uchardet);
 
     // This creates a build step. It will be visible in the `zig build --help` menu,
